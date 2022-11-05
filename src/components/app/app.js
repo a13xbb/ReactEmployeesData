@@ -15,6 +15,8 @@ class App extends React.Component {
                 {name: "Vincent M.", salary: 3000, increase: false, liked: false, id: 2},
                 {name: "Tommy G.", salary: 5000, increase: false, liked: false, id: 3},
             ],
+            searchTerm: '',
+            filterTerm: 'all',
         }
         this.maxId = 4;
     }
@@ -67,21 +69,64 @@ class App extends React.Component {
         }))
     }
 
+    searchEmployee = (items, searchTerm) => {
+        if (searchTerm.length === 0) {
+            return items;
+        }
+
+        return items.filter(item => {
+            return item.name.toLowerCase().indexOf(searchTerm.toLowerCase()) > -1;
+        })
+    }
+
+    onUpdateSearch = (searchTerm) => {
+        this.setState({searchTerm: searchTerm})
+    }
+
+    filterEmployee = (items, filterTerm) => {
+        try {
+            switch (filterTerm) {
+                case "all":
+                    return items;
+                case "liked":
+                    return items.filter(item => item.liked);
+                case "salary":
+                    return items.filter(item => item.salary > 1000);
+                default:
+                    // eslint-disable-next-line no-throw-literal
+                    throw "UNEXPECTED FILTER VALUE";
+            }
+        }
+        catch (e) {
+            console.error(e);
+        }
+    }
+
+    onUpdateFilter = (filter) => {
+        this.setState({
+            filterTerm: filter,
+        })
+    }
+
     render() {
-        const {data} = this.state;
+        const {data, searchTerm, filterTerm} = this.state;
         const employeesCnt = data.length;
         const increasedEmployeesCnt = data.filter(item => item.increase).length;
+        let visibleData = this.filterEmployee(this.searchEmployee(data, searchTerm), filterTerm);
         return (
             <div className="app">
                 <AppInfo 
                     employeesCnt={employeesCnt}
                     increasedEmployeesCnt={increasedEmployeesCnt}/>
                 <div className="search-panel">
-                    <SearchPanel />
-                    <AppFilter />
+                    <SearchPanel onUpdateSearch={this.onUpdateSearch}/>
+                    <AppFilter
+                        filter={filterTerm}
+                        onUpdateFilter={this.onUpdateFilter} />
                 </div>
-                <EmployeesList 
-                    data={this.state.data}
+                <EmployeesList
+                    isEmpty={!Boolean(visibleData.length)}
+                    data={visibleData}
                     onDelete={this.deleteItem}
                     onToggleProp={this.onToggleProp}/>
                 <EmployeesAddForm 

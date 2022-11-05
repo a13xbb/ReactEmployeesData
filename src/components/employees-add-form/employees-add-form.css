@@ -15,3 +15,10 @@
     width: 350px;
     margin-right: 20px;
 }
+
+.bc-red {
+    border-color: red;
+    border-radius: 2px;
+    border-radius: 0.375rem;
+    transition: 0.5s linear all;
+}

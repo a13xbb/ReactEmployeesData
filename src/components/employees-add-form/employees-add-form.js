@@ -17,16 +17,32 @@ class EmployeesAddForm extends React.Component {
         })
     } 
 
+    onAdd = (e, name, salary) => {
+        this.props.onAdd(e, name, salary);
+        let inputs = e.target.querySelectorAll('input');
+        for (let input of inputs) {
+            if (!input.value) {
+                input.classList.add('bc-red');
+                setTimeout(() => input.classList.remove('bc-red'), 4000)
+            }
+        }
+        if (name && salary) {
+            this.setState({
+                name: '',
+                salary: ''
+            })
+        }
+    }
+
     render() {
         const {name, salary} = this.state;
-        let {onAdd} = this.props;
 
         return (
             <div className="app-add-form">
                 <h3>Добавьте нового сотрудника</h3>
                 <form
                     className="add-form d-flex"
-                    onSubmit={(e) => onAdd(e, name, salary)}>
+                    onSubmit={(e) => this.onAdd(e, name, salary)}>
                     <input type="text"
                         className="form-control new-post-label"
                         name="name"
